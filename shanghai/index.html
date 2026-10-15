@@ -166,6 +166,7 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .backdrop.on{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:70;max-width:680px;margin:0 auto;height:min(92dvh,92vh);background:var(--card);border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
 .sheet.on{transform:translateY(0)}
+.sheet-body{touch-action:pan-y}
 .sheet-head{flex:0 0 auto;padding:8px 16px 8px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid var(--line)}
 .sheet-head::before{content:"";position:absolute;left:50%;top:6px;width:36px;height:5px;border-radius:3px;background:var(--gray2);transform:translateX(-50%);opacity:.6}
 .sheet-head .sh-day{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:10px;flex:1}
@@ -367,6 +368,35 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
   // swipe down on head to close
   let sy=null;sheet.querySelector('.sheet-head').addEventListener('touchstart',e=>{sy=e.touches[0].clientY;},{passive:true});
   sheet.querySelector('.sheet-head').addEventListener('touchmove',e=>{if(sy!==null&&e.touches[0].clientY-sy>60){sy=null;closeSheet();}},{passive:true});
+  // ---- 카드 본문 좌우 밀기: 왼쪽으로 밀면 다음, 오른쪽이면 이전. 세로 스크롤과 헷갈리지 않게 옆으로 확실히 더 움직였을 때만
+  const SWIPE_MIN=60,SWIPE_RATIO=1.5,SWIPE_DECIDE=10,EDGE_PULL=0.25,SLIDE_IN=40;
+  let sx=null,sy0=0,dx=0,horiz=null;
+  // 카드 안에서 옆으로 스크롤되는 칸(긴 중국어 주소 등)은 그 칸의 스크롤이 먼저다
+  function inSideScroller(el){for(;el&&el!==body;el=el.parentElement){if(el.scrollWidth>el.clientWidth+2&&getComputedStyle(el).overflowX!=='visible')return true;}return false;}
+  function slideIn(fromRight){body.style.transition='none';body.style.transform='translateX('+(fromRight?SLIDE_IN:-SLIDE_IN)+'px)';void body.offsetWidth;body.style.transition='transform .2s ease';body.style.transform='';}
+  function resetSwipe(){sx=null;body.style.transition='transform .2s ease';body.style.transform='';}
+  body.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1||inSideScroller(e.target)){sx=null;return;}
+    sx=e.touches[0].clientX;sy0=e.touches[0].clientY;dx=0;horiz=null;body.style.transition='none';
+  },{passive:true});
+  body.addEventListener('touchmove',e=>{
+    if(sx===null)return;
+    const mx=e.touches[0].clientX-sx,my=e.touches[0].clientY-sy0;
+    if(horiz===null&&(Math.abs(mx)>SWIPE_DECIDE||Math.abs(my)>SWIPE_DECIDE))horiz=Math.abs(mx)>Math.abs(my)*SWIPE_RATIO;
+    if(!horiz)return;
+    const atEdge=(mx>0&&cur<=0)||(mx<0&&cur>=META.length-1);
+    dx=atEdge?mx*EDGE_PULL:mx;
+    body.style.transform='translateX('+dx+'px)';
+  },{passive:true});
+  body.addEventListener('touchend',()=>{
+    if(sx===null)return;
+    const go=horiz&&Math.abs(dx)>=SWIPE_MIN,toNext=dx<0;
+    resetSwipe();
+    if(!go)return;
+    if(toNext&&cur<META.length-1){sheet.querySelector('.next').click();slideIn(true);}
+    else if(!toNext&&cur>0){sheet.querySelector('.prev').click();slideIn(false);}
+  });
+  body.addEventListener('touchcancel',()=>{if(sx!==null)resetSwipe();});
   document.addEventListener('keydown',e=>{if(!sheet.classList.contains('on'))return;if(e.key==='Escape')closeSheet();if(e.key==='ArrowRight')sheet.querySelector('.next').click();if(e.key==='ArrowLeft')sheet.querySelector('.prev').click();});
   // ---- inner bindings (buttons inside sheet / page)
   const toast=document.querySelector('.toast');let tt;
