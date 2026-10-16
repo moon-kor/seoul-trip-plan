@@ -129,6 +129,14 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .place-row:last-child{border-bottom:0}.place-row b{display:block;font-size:15.5px}.place-row span{font-size:13px;color:var(--muted)}
 .place-row.map-selected,.place-row.current-row{background:var(--blue-soft)}
 .pin{display:grid;place-items:center;width:28px;height:28px;background:var(--blue);color:#fff;border:2px solid #fff;border-radius:50%;font-weight:700;font-size:13px}.pin--on{background:#B42318;transform:scale(1.1)}
+.pin{box-shadow:0 1px 4px rgba(0,0,0,.35)}.pin--on{outline:3px solid #B42318;outline-offset:1px}.pin--me{background:#0A84FF!important;width:18px;height:18px;font-size:0}
+.pl-day{display:flex;align-items:center;gap:8px;padding:10px 16px 6px;font-size:13px;font-weight:800;color:var(--muted);border-bottom:.5px solid var(--line)}
+.pl-day i{width:10px;height:10px;border-radius:50%}
+.place-row{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px}
+.place-row .pr-main{flex:1;display:flex;align-items:center;gap:10px;text-align:left;min-height:44px}
+.place-row .pr-num{flex:0 0 26px;height:26px;border-radius:50%;color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+.place-row .pr-txt b{display:block;font-size:15.5px}.place-row .pr-txt span{font-size:13px;color:var(--muted)}
+.place-row .pr-card{flex:0 0 auto;min-height:40px;padding:0 12px;border-radius:999px;background:var(--fill);color:var(--blue);font-size:13.5px;font-weight:700}
 .addr code{display:block;font-family:inherit;font-size:14px;color:var(--muted);margin:4px 0 2px;line-height:1.5;white-space:normal}
 .sources{margin-top:14px;border-top:.5px solid var(--line);padding-top:10px}.sources summary{font-size:14px;font-weight:600;color:var(--blue);cursor:pointer;min-height:40px;display:flex;align-items:center}
 .src a{display:block;font-size:13px;color:var(--muted);margin:6px 0;line-height:1.45}
@@ -242,18 +250,13 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
   <div class="daypane" id="pane-day3"><h2>느긋한 아침, 맛있는 점심,<br>가족사진</h2><p class="fine" style="margin:0 0 12px">10월 23일 금요일. 마지막 날 점심이 늦어지면 와이탄 산책을 짧게 하거나 생략해 공항 시간을 지킵니다.</p><div class="stoplist"><button class="stop-row" data-i="20"><span class="st-time">08:00~09:00</span><span class="st-body"><b>기상·호텔 조식·짐 정리</b><span>디즈니 다음 날이라 여유롭게 시작</span></span><span class="chev">›</span></button><button class="stop-row" data-i="21"><span class="st-time">09:00~09:30</span><span class="st-body"><b>체크아웃·시내 이동</b><span>짐 처리 방식을 전날까지 확정</span></span><span class="chev">›</span></button><button class="stop-row" data-i="22"><span class="st-time">10:30~12:00</span><span class="st-body"><b>예원·예원상성 산책</b><span>구곡교 주변 사진·간식. 정원 내부는 원할 때만 입장</span></span><span class="chev">›</span></button><button class="stop-row" data-i="23"><span class="st-time">12:00~13:15</span><span class="st-body"><b>점심 · 난샹만터우뎬</b><span>난샹만터우뎬 우선, 뤼보랑 대안. 긴 대기는 피하기</span></span><span class="chev">›</span></button><button class="stop-row" data-i="24"><span class="st-time">13:30~14:15</span><span class="st-body"><b>와이탄 산책·가족사진</b><span>강 건너 동방명주·상하이타워를 배경으로 촬영</span></span><span class="chev">›</span></button><button class="stop-row" data-i="25"><span class="st-time">14:15~14:30</span><span class="st-body"><b>푸동공항 T2로 출발</b><span>교통이 혼잡하거나 짐 찾는 시간이 필요하면 더 일찍 출발</span></span><span class="chev">›</span></button><button class="stop-row" data-i="26"><span class="st-time">15:30~16:00</span><span class="st-body"><b>공항 도착·체크인·출국수속</b><span>목표 시간 · 항공사 수속 마감시간 준수</span></span><span class="chev">›</span></button><button class="stop-row" data-i="27"><span class="st-time">18:05</span><span class="st-body"><b>푸동공항 T2 출발</b><span>항공편 시간은 예약표 기준, 출발 전 재확인</span></span><span class="chev">›</span></button><button class="stop-row" data-i="28"><span class="st-time">20:35</span><span class="st-body"><b>제주 도착</b><span>한국 시간</span></span><span class="chev">›</span></button></div></div>
 </div></section>
 <section class="tabpane" id="tab-map"><div class="pad">
-  <h2>세 날의 핵심 위치</h2>
+  <h2>날짜별 동선</h2>
   <p class="fine" style="margin:0 0 10px">‘길찾기’ 버튼은 고덕지도 앱을 먼저 열고, 없으면 웹 지도로 열립니다.</p>
   <div class="cl-tools" style="margin:0 0 10px"><button class="btn sec" id="locateBtn">내 현재 위치 표시</button><span class="fine" id="locationStatus" style="margin:0"></span></div>
+  <div class="seg2 map-seg"><button data-mday="all">전체</button><button data-mday="day1">Day 1</button><button data-mday="day2">Day 2</button><button data-mday="day3">Day 3</button></div>
   <div id="mapbox" class="mapbox"><div class="map-fallback">지도를 불러오는 중입니다.</div></div>
   <p class="fine" style="margin:8px 0 10px">지도 그림이 안 나오면(중국 현지 인터넷에서 자주 그럼) 아래 목록과 고덕지도 단추를 쓰세요. 🚕 단추는 인터넷 없이도 열립니다.</p>
-  <div class="place-list card" id="placeList">
-    <button class="place-row"><b>1 · 푸동공항 T2</b><span>1일차 도착 · 3일차 출발</span></button>
-    <button class="place-row"><b>2 · 상하이 야생동물원</b><span>1일차 · 오후 사파리</span></button>
-    <button class="place-row"><b>3 · 상하이 디즈니랜드</b><span>2일차 · 종일</span></button>
-    <button class="place-row"><b>4 · 예원·예원상성</b><span>3일차 · 오전 산책·점심</span></button>
-    <button class="place-row"><b>5 · 와이탄</b><span>3일차 · 가족사진</span></button>
-  </div>
+  <div class="place-list card" id="placeList"></div>
   <h3 class="h3">중국어 검색명 · 호텔·기사에게 보여주기</h3>
   <div class="card addr"><b>윤허예보 호텔 <span class="tag red">확정 전</span></b><code>云和夜泊酒店（上海浦东国际机场店），浦东新区祝桥镇秋亭路128弄</code><p class="fine">예약한 지점의 중국어명·주소를 예약앱에서 복사해 쓰세요. 이 주소는 예약표와 대조 전입니다.</p><div class="actions"><button class="btn copy-btn" data-copy="云和夜泊酒店（上海浦东国际机场店），浦东新区祝桥镇秋亭路128弄">주소 복사(확정 전)</button></div></div>
   <div class="card addr"><b>MINISO LAND</b><code>MINISO LAND 南京东路 / 名创优品 南京东路 旗舰店<br>上海市黄浦区南京东路479号</code><p class="fine">일반 미니소와 대형 플래그십을 구분하세요.</p><div class="actions"><button class="btn copy-btn" data-copy="MINISO LAND，上海市黄浦区南京东路479号">주소 복사</button></div></div>
@@ -516,27 +519,65 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
     boxes.forEach(b=>b.addEventListener('change',sync));if(reset)reset.addEventListener('click',()=>{boxes.forEach(b=>b.checked=false);sync();});sync();
   });
   // ---- map (lazy)
+  // 날짜별 동선. 좌표는 국제 표준(WGS-84): 위키백과·OpenStreetMap. approx=true 는 주소로 짐작한 대략 위치
+  const DAY_COLOR={day1:'#FF9500',day2:'#34C759',day3:'#E0A800'},DAY_LABEL={day1:'1일차',day2:'2일차',day3:'3일차'};
   const places=[
-    {label:'푸동공항 T2',venue:'上海浦东国际机场 T2航站楼',locality:'상하이',country:'중국',lat:31.14333,lng:121.80528},
-    {label:'상하이 야생동물원',venue:'上海野生动物园',address:'南六公路178号',locality:'상하이',country:'중국',lat:31.05738,lng:121.71664},
-    {label:'상하이 디즈니랜드',venue:'上海迪士尼乐园',locality:'상하이',country:'중국',lat:31.1440,lng:121.6570},
-    {label:'예원·예원상성',venue:'豫园',locality:'상하이',country:'중국',lat:31.22917,lng:121.4875},
-    {label:'와이탄',venue:'外滩',locality:'상하이',country:'중국',lat:31.238028,lng:121.486139}
-  ];
+    {day:'day1',label:'푸동공항 T2 도착',note:'11:55 도착',venue:'上海浦东国际机场 T2航站楼',lat:31.14333,lng:121.80528,card:'푸동공항 T2 도착'},
+    {day:'day1',label:'상하이 야생동물원',note:'14:00~17:00 사파리',venue:'上海野生动物园',lat:31.05738,lng:121.71664,card:'상하이 야생동물원'},
+    {day:'day1',label:'상하이 그랜드마더',note:'18:30~19:30 저녁',venue:'上海姥姥',lat:31.23738,lng:121.48452,card:'저녁식사 · 상하이 그랜드마더'},
+    {day:'day1',label:'MINISO LAND',note:'19:30~21:00 · 핀은 대략 위치',venue:'MINISO LAND 南京东路',lat:31.2367,lng:121.4800,approx:true,card:'MINISO LAND'},
+    {day:'day2',label:'상하이 디즈니랜드',note:'종일',venue:'上海迪士尼乐园',lat:31.1440,lng:121.6570,card:'호텔 → 상하이 디즈니랜드'},
+    {day:'day3',label:'예원·예원상성',note:'10:30 산책 · 12:00 점심(난샹만터우뎬·뤼보랑)',venue:'豫园',lat:31.22917,lng:121.4875,card:'예원·예원상성 산책'},
+    {day:'day3',label:'와이탄',note:'13:30 가족사진',venue:'外滩',lat:31.238028,lng:121.486139,card:'와이탄 산책·가족사진'},
+    {day:'day3',label:'푸동공항 T2 출발',note:'15:30 도착 · 18:05 출발',venue:'上海浦东国际机场 T2航站楼',lat:31.14333,lng:121.80528,card:'푸동공항 T2 출발'}
+  ].map(p=>Object.assign({locality:'상하이',country:'중국'},p));
+  {const seen={};places.forEach(p=>{seen[p.day]=(seen[p.day]||0)+1;p.order=seen[p.day];});}
+  // 여행 기간이면 상하이 날짜로 오늘을, 아니면 전체를 먼저 보여 준다(휴대폰 시간대 설정과 무관)
+  const TRIP_DAYS={'2026-10-21':'day1','2026-10-22':'day2','2026-10-23':'day3'};
+  let mapDay='all';try{mapDay=TRIP_DAYS[new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date())]||'all';}catch(e){mapDay='all';}
+  let myPos=null;
   const mapEl=document.getElementById('mapbox'),placeList=document.getElementById('placeList'),locationStatus=document.getElementById('locationStatus');
   function fallback(){mapEl.innerHTML='<div class="map-fallback"><div><b>지도를 표시할 수 없습니다.</b><br>아래 장소 목록과 중국어 주소를 이용하세요.</div></div>';}
-  function renderMap(cur){
-    const old=placeList.querySelector('.current-row');if(old)old.remove();
-    const shown=cur?[...places,cur]:places;
-    if(cur){const row=document.createElement('button');row.className='place-row current-row';row.innerHTML='<b>6 · 내 현재 위치</b><span>기기 위치 정보</span>';placeList.appendChild(row);}
-    const rows=[...placeList.querySelectorAll('.place-row')];mapEl.innerHTML='';
-    if(window.MapHelpers){try{MapHelpers.mountPlaceListMap(mapEl,{places:shown,rows:rows,baseStyle:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light',selectedClass:'map-selected'},fallback);}catch(e){fallback();}}else{fallback();}
+  function routeOverlay(shown){
+    const features=['day1','day2','day3'].map(d=>{const pts=shown.filter(p=>p.day===d);
+      return pts.length<2?null:{type:'Feature',properties:{color:DAY_COLOR[d]},geometry:{type:'LineString',coordinates:pts.map(p=>[p.lng,p.lat])}};}).filter(Boolean);
+    return {id:'route',data:{type:'FeatureCollection',features},layers:[{id:'route-line',type:'line',source:'route',
+      layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':3.5,'line-opacity':.85,'line-dasharray':[2,1.6]}}]};
   }
+  function openCardByTitle(title){const k=META.findIndex(m=>m.title===title);if(k<0)return;showDay(META[k].day);openSheet(k);}
+  function renderList(shown){
+    placeList.innerHTML='';const rows=[];let lastDay=null;
+    shown.forEach(p=>{
+      if(p.me){const r=document.createElement('div');r.className='place-row current-row';r.innerHTML='<button class="pr-main"><span class="pr-num" style="background:#0A84FF">●</span><span class="pr-txt"><b>내 현재 위치</b><span>휴대폰 위치(중국에선 수백 m 어긋날 수 있음)</span></span></button>';placeList.appendChild(r);rows.push(r);return;}
+      if(p.day!==lastDay){lastDay=p.day;const hd=document.createElement('div');hd.className='pl-day';hd.innerHTML='<i style="background:'+DAY_COLOR[p.day]+'"></i>'+DAY_LABEL[p.day];placeList.appendChild(hd);}
+      const r=document.createElement('div');r.className='place-row';
+      r.innerHTML='<button class="pr-main"><span class="pr-num" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</span><span class="pr-txt"><b></b><span></span></span></button><button class="pr-card">일정 카드</button>';
+      r.querySelector('b').textContent=p.label;r.querySelector('.pr-txt span').textContent=p.note;
+      r.querySelector('.pr-card').addEventListener('click',()=>openCardByTitle(p.card));
+      placeList.appendChild(r);rows.push(r);
+    });
+    return rows;
+  }
+  function renderMap(){
+    document.querySelectorAll('.map-seg button').forEach(b=>b.classList.toggle('on',b.dataset.mday===mapDay));
+    const shown=places.filter(p=>mapDay==='all'||p.day===mapDay).concat(myPos?[myPos]:[]);
+    const rows=renderList(shown);mapEl.innerHTML='';
+    const highlight=(index,scroll)=>{rows.forEach((r,k)=>r.classList.toggle('map-selected',k===index));if(scroll&&index!==null&&rows[index])rows[index].scrollIntoView({block:'nearest'});};
+    if(!window.MapHelpers){fallback();return;}
+    try{
+      const map=MapHelpers.mountMap(mapEl,{places:shown,overlays:[routeOverlay(shown)],
+        baseStyle:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light',
+        marker:(p,index,selected)=>p.me?'<div class="pin pin--me"></div>':'<div class="pin'+(selected?' pin--on':'')+'" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</div>',
+        onSelectPlace:index=>highlight(index,true)},fallback);
+      if(map)rows.forEach((r,k)=>r.querySelector('.pr-main').addEventListener('click',()=>{map.selectPlace(k);highlight(k,false);}));
+    }catch(e){fallback();}
+  }
+  document.querySelectorAll('.map-seg button').forEach(b=>b.addEventListener('click',()=>{mapDay=b.dataset.mday;renderMap();}));
   function ensureMap(){if(mapReady)return;mapReady=true;setTimeout(()=>renderMap(),50);}
   document.getElementById('locateBtn').addEventListener('click',()=>{
     if(!navigator.geolocation){locationStatus.textContent='이 기기에서는 현재 위치를 사용할 수 없습니다.';return;}
     locationStatus.textContent='현재 위치를 확인하는 중…';
-    navigator.geolocation.getCurrentPosition(pos=>{renderMap({label:'내 현재 위치',venue:'내 현재 위치',locality:'',country:'',lat:pos.coords.latitude,lng:pos.coords.longitude});locationStatus.textContent='현재 위치를 표시했습니다.';},
+    navigator.geolocation.getCurrentPosition(pos=>{myPos={me:true,label:'내 현재 위치',venue:'내 현재 위치',locality:'',country:'',lat:pos.coords.latitude,lng:pos.coords.longitude};renderMap();locationStatus.textContent='현재 위치를 표시했습니다.';},
       ()=>{locationStatus.textContent='위치 권한이 없어 표시하지 못했습니다.';},{enableHighAccuracy:true,timeout:10000});
   });
   // ---- restore
