@@ -261,6 +261,11 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .ph-zh{display:block;font-size:21px;font-weight:700;line-height:1.35;margin:2px 0 1px;word-break:keep-all;overflow-wrap:anywhere}
 .ph-rd{display:block;font-size:13.5px;color:var(--muted)}
 .ph-copy{flex:0 0 auto;min-height:36px;padding:0 12px;border-radius:10px;background:var(--fill2);color:var(--blue);font-size:13px;font-weight:700}
+/* 카드 위쪽 도구 줄: 지도에서 보기 + 고덕지도(카드 맨 아래에서 올림) */
+.card-tools{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px}
+.card-tools button{flex:1 1 40%;min-width:0;min-height:44px;padding:6px 10px;border-radius:14px;background:var(--fill2);font-size:15px;font-weight:700;color:var(--ink)}
+.card-tools .ct-map{color:var(--blue)}
+.pr-dist{color:var(--blue);font-weight:700}
 .taxi-btn{display:flex;width:100%;min-height:48px;margin:4px 0 10px;padding:8px 14px;border-radius:14px;background:#FFCC00;color:#1c1c1e;font-size:16px;font-weight:800;align-items:center;justify-content:center;gap:6px;text-align:center}
 .taxi-btn.self{background:var(--fill);color:var(--blue);font-size:14px;min-height:40px;font-weight:700}
 .taxi-box{display:none;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--card);border:1.5px solid #FFCC00}
@@ -688,7 +693,7 @@ html,body{overscroll-behavior-x:none}
   const phOpen=()=>phPanel.classList.contains('on');
   function renderPhrases(which){
     phPanel.querySelectorAll('.ph-seg button').forEach(b=>b.classList.toggle('on',b.dataset.v===which));
-    const rows=which==='here'?PHRASES[phKey][1]:PH_COMMON;phList.innerHTML='';
+    const rows=which==='here'?phWayRows(phTitle).concat(PHRASES[phKey][1]):PH_COMMON;phList.innerHTML='';
     rows.forEach(([ko,zh,rd])=>{
       const r=document.createElement('div');r.className='ph-row';const t=document.createElement('div');t.className='ph-txt';
       [['ph-ko',ko],['ph-zh',zh],['ph-rd',rd]].forEach(([c,v])=>{const e=document.createElement('span');e.className=c;e.textContent=v;t.appendChild(e);});
@@ -698,8 +703,16 @@ html,body{overscroll-behavior-x:none}
       r.append(t,cp);phList.appendChild(r);});
     phList.scrollTop=0;
   }
-  function showPhrases(key){
-    phKey=key;document.getElementById('phTitle').textContent='💬 '+PHRASES[key][0]+'에서 쓰는 중국어';renderPhrases('here');
+  // 이 카드 장소로 가는 길 묻기(장소 중국어 이름이 있을 때만)
+  function phWayRows(title){
+    const p=PLACES_ZH[THIS_STOP[title]];if(!p)return [];
+    const rows=[[p.name+'까지 어떻게 가요?','请问，'+p.lines[0][0]+'怎么走？','칭원, ('+p.name+') 전머 쩌우?']];
+    if(p.lines[1])rows.push(['주소: '+p.lines[1][1],p.lines[1][0],'(주소는 이 화면을 보여 주세요)']);
+    return rows;
+  }
+  let phTitle='';
+  function showPhrases(key,title){
+    phKey=key;phTitle=title||'';document.getElementById('phTitle').textContent='💬 '+PHRASES[key][0]+'에서 쓰는 중국어';renderPhrases('here');
     if(!phOpen())history.pushState({ph:1},'');
     phPanel.classList.add('on');phBack.classList.add('on');phPanel.setAttribute('aria-hidden','false');
   }
@@ -711,15 +724,26 @@ html,body{overscroll-behavior-x:none}
   function phraseButton(title){
     const key=PH_CARD[title];if(!key)return null;
     const b=document.createElement('button');b.type='button';b.className='phr-btn';
-    b.append('💬 여기서 쓰는 중국어');const n=document.createElement('span');n.textContent=PHRASES[key][1].length+'문장 ›';b.appendChild(n);
-    b.addEventListener('click',()=>showPhrases(key));return b;
+    b.append('💬 여기서 쓰는 중국어');const n=document.createElement('span');n.textContent=(phWayRows(title).length+PHRASES[key][1].length)+'문장 ›';b.appendChild(n);
+    b.addEventListener('click',()=>showPhrases(key,title));return b;
   }
   // 카드: 제목 아래에 「다음 목적지」, 그 아래 작게 「이 장소 주소」
+  // 카드 맨 아래 고덕지도 단추를 위로 올리고, 주소 복사 줄은 노란 상자의 「중국어 복사」와 겹쳐 지운다
+  function cardTools(root,title){
+    const row=document.createElement('div');row.className='card-tools';
+    const pin=places.find(p=>p.card===title);
+    if(pin){const b=document.createElement('button');b.type='button';b.className='ct-map';b.textContent='📍 지도에서 보기';
+      b.addEventListener('click',()=>showOnMap(pin));row.appendChild(b);}
+    const amaps=[...root.querySelectorAll('.actions .map-search')];
+    amaps.forEach(el=>{el.className='ct-amap map-search';
+      el.textContent='🧭 '+(amaps.length===1?'고덕지도':el.textContent.replace(/\s*(고덕지도에서\s*)?(길)?찾기$/,'').trim());row.appendChild(el);});
+    root.querySelectorAll('.actions').forEach(a=>a.remove());
+    return row.children.length?row:null;
+  }
   function addTaxiButtons(root,title){
     const anchor=root.querySelector('.sub')||root.firstChild;
     const phr=phraseButton(title);if(phr)anchor.after(phr);
-    const self=THIS_STOP[title]?taxiBlock(THIS_STOP[title],'📍 이 장소 주소 보기','이 장소 · '+PLACES_ZH[THIS_STOP[title]].name,false,true):null;
-    if(self)anchor.after(self);
+    const tools=cardTools(root,title);if(tools)anchor.after(tools);
     const next=nextBlock(title);if(next)anchor.after(next);
     if(MOVES[title])anchor.after(moveLines('move-line',MOVES[title]));
   }
@@ -978,6 +1002,12 @@ html,body{overscroll-behavior-x:none}
   const TRIP_DAYS={'2026-10-21':'day1','2026-10-22':'day2','2026-10-23':'day3'};
   let mapDay='all';try{mapDay=TRIP_DAYS[new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date())]||'all';}catch(e){mapDay='all';}
   let myPos=null;
+  // 카드의 「지도에서 보기」로 넘어온 장소. 날짜 단추를 직접 누르면 풀린다
+  let focusPlace=null;
+  const NEAR_KM=40;
+  function distKm(a,b){const r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLo=(b.lng-a.lng)*r;
+    const h=Math.sin(dLa/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLo/2)**2;return 12742*Math.asin(Math.sqrt(h));}
+  function fmtDist(km){return km<1?'약 '+Math.round(km*1000/10)*10+'m':km<10?'약 '+km.toFixed(1)+'km':'약 '+Math.round(km)+'km';}
   const mapEl=document.getElementById('mapbox'),placeList=document.getElementById('placeList'),locationStatus=document.getElementById('locationStatus');
   function fallback(){mapEl.innerHTML='<div class="map-fallback"><div><b>지도를 표시할 수 없습니다.</b><br>아래 장소 목록과 중국어 주소를 이용하세요.</div></div>';}
   function routeOverlay(shown){
@@ -995,7 +1025,11 @@ html,body{overscroll-behavior-x:none}
       const r=document.createElement('div');r.className='place-row';
       r.innerHTML='<button class="pr-main"><span class="pr-num" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</span><span class="pr-txt"><b></b><span></span></span></button><button class="pr-card">일정 카드</button>';
       r.querySelector('b').textContent=p.label;r.querySelector('.pr-txt span').textContent=p.note;
+      if(myPos){const d=document.createElement('span');d.className='pr-dist';d.textContent=' · 내 위치에서 '+fmtDist(distKm(myPos,p));r.querySelector('.pr-txt span').appendChild(d);}
       r.querySelector('.pr-card').addEventListener('click',()=>openCardByTitle(p.card));
+      // 「일정 카드」에 이벤트를 단 뒤에 붙인다(같은 모양 클래스라 먼저 붙이면 querySelector가 이쪽을 집는다)
+      const am=document.createElement('button');am.className='pr-card map-search';am.textContent='고덕';am.dataset.name=p.venue;
+      r.querySelector('.pr-card').before(am);bindInner(r);
       placeList.appendChild(r);rows.push(r);
     });
     return rows;
@@ -1009,6 +1043,11 @@ html,body{overscroll-behavior-x:none}
     const FLY_RETRY_MS=300,FLY_RETRY_MAX=17;
     // 지도 본체가 아직 없으면(첫 로딩 중) 누른 것을 버리지 않고 잠깐씩 다시 시도한다(약 5초). 그림 조각 로딩은 기다리지 않는다 — 막힌 망에서도 이동은 되게
     const flyToPlace=(index,tries=0)=>{const m=map&&map.getMap&&map.getMap(),p=shown[index];if(!p)return;if(!m){if(tries<FLY_RETRY_MAX)setTimeout(()=>flyToPlace(index,tries+1),FLY_RETRY_MS);return;}m.easeTo({center:[p.lng,p.lat],zoom:Math.max(m.getZoom(),FOCUS_ZOOM),duration:700});};
+    // 카드에서 넘어온 장소: 내 위치가 가까우면 둘 다 들어오게, 멀면 그 장소로
+    const focusView=(index,tries=0)=>{const m=map&&map.getMap&&map.getMap(),p=shown[index];if(!p)return;
+      if(!m){if(tries<FLY_RETRY_MAX)setTimeout(()=>focusView(index,tries+1),FLY_RETRY_MS);return;}
+      if(myPos&&distKm(myPos,p)<NEAR_KM){m.fitBounds([[Math.min(p.lng,myPos.lng),Math.min(p.lat,myPos.lat)],[Math.max(p.lng,myPos.lng),Math.max(p.lat,myPos.lat)]],{padding:60,maxZoom:FOCUS_ZOOM,duration:700});}
+      else m.easeTo({center:[p.lng,p.lat],zoom:FOCUS_ZOOM,duration:700});};
     if(!window.MapHelpers){fallback();return;}
     try{
       map=MapHelpers.mountMap(mapEl,{places:shown,overlays:[routeOverlay(shown)],
@@ -1016,16 +1055,25 @@ html,body{overscroll-behavior-x:none}
         marker:(p,index,selected)=>p.me?'<div class="pin pin--me"></div>':'<div class="pin'+(selected?' pin--on':'')+'" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</div>',
         onSelectPlace:index=>{highlight(index,true);if(index!==null)flyToPlace(index);}},fallback);
       if(map)rows.forEach((r,k)=>r.querySelector('.pr-main').addEventListener('click',()=>{map.selectPlace(k);highlight(k,false);flyToPlace(k);mapEl.scrollIntoView({behavior:'smooth',block:'center'});}));
+      const fk=focusPlace?shown.indexOf(focusPlace):-1;
+      if(map&&fk>=0){map.selectPlace(fk);highlight(fk,true);setTimeout(()=>focusView(fk),60);}
     }catch(e){fallback();}
   }
-  document.querySelectorAll('.map-seg button').forEach(b=>b.addEventListener('click',()=>{mapDay=b.dataset.mday;renderMap();}));
+  document.querySelectorAll('.map-seg button').forEach(b=>b.addEventListener('click',()=>{mapDay=b.dataset.mday;focusPlace=null;renderMap();}));
   function ensureMap(){if(mapReady)return;mapReady=true;setTimeout(()=>renderMap(),50);}
-  document.getElementById('locateBtn').addEventListener('click',()=>{
+  document.getElementById('locateBtn').addEventListener('click',()=>locateMe());
+  // 카드 → 지도 탭: 그 날짜 핀만 보이게 하고 그 장소로 옮긴 뒤 내 위치도 잡는다
+  function showOnMap(pin){
+    const go=()=>{mapDay=pin.day;focusPlace=pin;const was=mapReady;showTab('map');if(was)renderMap();if(!myPos)locateMe();};
+    if(sheet.classList.contains('on')&&isSheetState()){hideSheet();ownBacks++;window.addEventListener('popstate',()=>setTimeout(go,0),{once:true});history.back();}
+    else{hideSheet();go();}
+  }
+  function locateMe(){
     if(!navigator.geolocation){locationStatus.textContent='이 기기에서는 현재 위치를 사용할 수 없습니다.';return;}
     locationStatus.textContent='현재 위치를 확인하는 중…';
     navigator.geolocation.getCurrentPosition(pos=>{myPos={me:true,label:'내 현재 위치',venue:'내 현재 위치',locality:'',country:'',lat:pos.coords.latitude,lng:pos.coords.longitude};renderMap();locationStatus.textContent='현재 위치를 표시했습니다.';},
       ()=>{locationStatus.textContent='위치 권한이 없어 표시하지 못했습니다.';},{enableHighAccuracy:true,timeout:10000});
-  });
+  }
   // ---- restore
   let d='day1';try{d=localStorage.getItem('shtripC_day')||'day1';}catch(e){}showDay(d);
   let t=(location.hash||'').replace('#','');if(!document.getElementById('tab-'+t)){try{t=localStorage.getItem('shtripC_tab')||'home';}catch(e){t='home';}}
