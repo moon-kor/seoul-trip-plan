@@ -230,6 +230,18 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .mn-import{display:flex;align-items:center;justify-content:center;cursor:pointer}
 
 .move-row{display:flex;align-items:center;gap:6px;padding:7px 14px 7px 16px;background:var(--fill2);border-bottom:.5px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.35}.move-row:last-child{border-bottom:0}.move-row b{color:var(--ink);font-weight:700}.move-line{margin:2px 0 8px;padding:8px 12px;border-radius:12px;background:var(--fill2);font-size:14px;line-height:1.45}.move-line div+div{margin-top:2px}
+/* 환율 계산기 팝업: 어느 탭에서든 ¥ 단추로 연다 */
+.fx-fab{position:fixed;right:16px;bottom:calc(72px + var(--sab));z-index:55;width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;font-size:22px;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center}
+.fx-fab:active{transform:scale(.94)}
+.fx-back{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s}
+.fx-back.on{opacity:1;pointer-events:auto}
+.fx-panel{position:fixed;left:0;right:0;bottom:0;z-index:81;max-width:680px;margin:0 auto;background:var(--card);border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);padding:10px 16px calc(18px + var(--sab));transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.fx-panel.on{transform:translateY(0)}
+.fx-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}
+.fx-head h3{margin:0;font-size:19px}
+.fx-head button{width:44px;min-height:44px;border-radius:50%;background:var(--fill2);font-size:22px;color:var(--muted)}
+.mn-rateline{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--card);font-size:15px;font-weight:700;text-align:left}
+.mn-rateline b{color:var(--blue);white-space:nowrap}
 .taxi-btn{display:flex;width:100%;min-height:48px;margin:4px 0 10px;padding:8px 14px;border-radius:14px;background:#FFCC00;color:#1c1c1e;font-size:16px;font-weight:800;align-items:center;justify-content:center;gap:6px;text-align:center}
 .taxi-btn.self{background:var(--fill);color:var(--blue);font-size:14px;min-height:40px;font-weight:700}
 .taxi-box{display:none;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--card);border:1.5px solid #FFCC00}
@@ -321,17 +333,7 @@ html,body{overscroll-behavior-x:none}
 <section class="tabpane" id="tab-money"><div class="pad">
   <h2>경비</h2>
   <p class="fine" style="margin:0 0 12px">기록은 이 휴대폰 안에만 저장됩니다(다른 휴대폰과 맞춰지지 않음). 브라우저 데이터를 지우면 사라지니 가끔 아래 「백업」을 받아 두세요.</p>
-  <div class="card mn-card" id="mnRateCard">
-    <h3>환율 계산기</h3>
-    <div class="mn-rate"><span>1위안 =</span><input id="mnRate" inputmode="decimal" aria-label="1위안당 원"><span>원</span><button type="button" class="mn-mini" id="mnRateFetch">새로 받기</button></div>
-    <p class="fine" id="mnRateInfo" style="margin:4px 0 10px"></p>
-    <div class="mn-conv">
-      <label><span>위안 ¥</span><input id="mnCny" inputmode="decimal" placeholder="0"></label>
-      <span class="mn-eq">⇄</span>
-      <label><span>원 ₩</span><input id="mnKrw" inputmode="decimal" placeholder="0"></label>
-    </div>
-    <div class="mn-chips" id="mnQuick"></div>
-  </div>
+  <button type="button" class="mn-rateline" id="mnRateLine"><span id="mnRateShort">1위안 = …원</span><b>¥ 계산기 열기 ›</b></button>
   <div class="card mn-card">
     <h3>쓴 돈</h3>
     <div class="mn-total"><b id="mnTotKrw">₩0</b><span id="mnTotCny">¥0</span></div>
@@ -431,6 +433,19 @@ html,body{overscroll-behavior-x:none}
     <div class="checklist" data-store="prep2"><label><input type="checkbox"><span><b>여권 유효기간 6개월 이상</b> · 전원, 아이 포함. 디즈니 입장도 원본 여권</span></label><label><input type="checkbox"><span><b>무비자 조건 확인</b> · 한국 여권 30일 무비자(2026-12-31까지 보도) — 대사관 공지로 최종 확인</span></label><label><input type="checkbox"><span><b>입국카드 정보</b> · 호텔 중국어 주소(복사 버튼), 항공편명. 14세 미만 지문 면제</span></label><label><input type="checkbox"><span><b>인터넷</b> · 한국 통신사 로밍이면 카카오톡·구글·네이버 그대로. 현지 유심·일반 eSIM은 차단 → ‘중국 전용(홍콩 경유)’ eSIM이나 로밍</span></label><label><input type="checkbox"><span><b>알리페이에 한국 카드 등록</b> · 집에서 테스트. 소액 현금 200~300위안도 환전</span></label><label><input type="checkbox"><span><b>디디 앱</b> 또는 알리페이 안 디디 미니앱 · 중국어 주소 붙여넣기만</span></label><label><input type="checkbox"><span><b>멀티 어댑터 1개</b> · 220V, 콘센트 모양이 달라 한국 둥근 플러그는 어댑터 필요</span></label><label><input type="checkbox"><span><b>아이 비상카드</b> · 이름, 보호자 로밍 번호, 호텔 중국어 주소, “我走丢了” — 코팅해 주머니에</span></label><label><input type="checkbox"><span><b>상비약</b> · 멀미약(택시 1시간), 해열제, 밴드, 손소독제. 처방약은 영문 처방전</span></label><label><input type="checkbox"><span><b>휴지·물티슈</b> · 공중화장실에 휴지 없는 곳 많음. 수돗물은 마시지 않기</span></label><label><input type="checkbox"><span><b>여행자보험</b> · 아이 포함, 긴급전화 저장</span></label><label><input type="checkbox"><span><b>디즈니 날짜 티켓 + 동물원 티켓</b> · 여권 이름 정확히, 구매 화면 캡처</span></label><label><input type="checkbox"><span><b>교통·셔틀 확정</b> · 6명+짐 차량, 디즈니 왕복 셔틀, 마지막 날 14:15~14:30 공항행</span></label><label><input type="checkbox"><span><b>마지막 날 짐 처리 방법 확정</b> · 차량 보관 / 시내 보관 / 호텔 보관 중 하나</span></label><label><input type="checkbox"><span><b>호텔 지점 확인</b> · 예약앱 지점명이 「上海浦东国际机场店(푸동국제공항점)」인지, 주소가 사이트와 같은지</span></label><label><input type="checkbox"><span><b>휴대폰 시간 자동 설정</b> · 18:05 출발 = 한국시각 19:05</span></label><label><input type="checkbox"><span><b>파파고 중국어 오프라인 팩</b> · 고덕지도 앱 설치</span></label><label><input type="checkbox"><span><b>아이 쇼핑 예산 합의</b> · 위안으로 정하고 아이가 환율 계산</span></label></div><div class="cl-tools"><span class="cl-count"></span><button class="btn sec cl-reset" type="button">초기화</button></div>
   </div>
 </div></section>
+</div>
+<button type="button" class="fx-fab" id="fxFab" aria-label="환율 계산기 열기">¥</button>
+<div class="fx-back" id="fxBack"></div>
+<div class="fx-panel" id="fxPanel" role="dialog" aria-label="환율 계산기" aria-hidden="true">
+  <div class="fx-head"><h3>환율 계산기</h3><button type="button" id="fxClose" aria-label="닫기">×</button></div>
+    <div class="mn-rate"><span>1위안 =</span><input id="mnRate" inputmode="decimal" aria-label="1위안당 원"><span>원</span><button type="button" class="mn-mini" id="mnRateFetch">새로 받기</button></div>
+    <p class="fine" id="mnRateInfo" style="margin:4px 0 10px"></p>
+    <div class="mn-conv">
+      <label><span>위안 ¥</span><input id="mnCny" inputmode="decimal" placeholder="0"></label>
+      <span class="mn-eq">⇄</span>
+      <label><span>원 ₩</span><input id="mnKrw" inputmode="decimal" placeholder="0"></label>
+    </div>
+    <div class="mn-chips" id="mnQuick"></div>
 </div>
 <nav class="tabbar"><div class="tabbar-in"><button class="tabbtn on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/><path d="M10 20v-6h4v6"/></svg><span>홈</span></button><button class="tabbtn" data-tab="sched"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>일정</span></button><button class="tabbtn" data-tab="map"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg><span>지도</span></button><button class="tabbtn" data-tab="money"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3"/></svg><span>경비</span></button><button class="tabbtn" data-tab="learn"><svg viewBox="0 0 24 24"><path d="M6 7a6 6 0 0 1 12 0v13H6z"/><path d="M9 7V5a3 3 0 0 1 6 0v2M6 12h12"/></svg><span>배움</span></button><button class="tabbtn" data-tab="prep"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg><span>준비</span></button></div></nav>
 <div class="backdrop" id="backdrop"></div>
@@ -691,6 +706,7 @@ html,body{overscroll-behavior-x:none}
     // ---- 환율
     function renderRate(){
       $('mnRate').value=st.rate.value;
+      $('mnRateShort').textContent='1위안 = '+st.rate.value+'원 · '+st.rate.at;
       const src={auto:'자동으로 받은 값',manual:'직접 입력한 값',default:'기본값(아직 받아 오지 않음)'}[st.rate.source]||'';
       $('mnRateInfo').textContent=st.rate.at+' 기준 · '+src+(st.rate.source==='manual'?' — 「새로 받기」를 누르면 자동 값으로 돌아갑니다':'');
       $('mnQuick').innerHTML='';
@@ -854,6 +870,21 @@ html,body{overscroll-behavior-x:none}
     renderRate();renderAll();
     // 경비 탭을 열 때 환율이 오래됐으면 새로 받는다(직접 입력한 값은 덮어쓰지 않음)
     document.querySelector('.tabbtn[data-tab="money"]').addEventListener('click',()=>fetchRate(false));
+
+    // ---- 환율 계산기 팝업: 안드로이드 뒤로 가기로도 닫히게 기록 한 칸을 쌓는다
+    const fxPanel=$('fxPanel'),fxBack=$('fxBack');
+    const fxOpen=()=>fxPanel.classList.contains('on');
+    function showFx(){
+      if(fxOpen())return;
+      history.pushState({fx:1},'');
+      fxPanel.classList.add('on');fxBack.classList.add('on');fxPanel.setAttribute('aria-hidden','false');
+      fetchRate(false);
+    }
+    function hideFx(){fxPanel.classList.remove('on');fxBack.classList.remove('on');fxPanel.setAttribute('aria-hidden','true');document.activeElement?.blur?.();}
+    function closeFx(){if(!fxOpen())return;hideFx();if(history.state&&history.state.fx)history.back();}
+    window.addEventListener('popstate',()=>{if(fxOpen()&&!(history.state&&history.state.fx))hideFx();});
+    $('fxFab').addEventListener('click',showFx);$('mnRateLine').addEventListener('click',showFx);
+    $('fxClose').addEventListener('click',closeFx);fxBack.addEventListener('click',closeFx);
     if(location.hash==='#money')fetchRate(false);
   })();
 
