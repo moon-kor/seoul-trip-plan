@@ -267,6 +267,13 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .card-tools .ct-map{color:var(--blue)}
 .pr-dist{color:var(--blue);font-weight:700}
 .ph-fig{margin:0 0 12px}.ph-fig .photo{margin:0}.ph-cap{margin:4px 2px 0;font-size:11px;line-height:1.35;color:var(--muted)}.ph-cap a{color:inherit;text-decoration:underline}
+/* ☕ 커피 타임: 일정과 따로 보는 카페 핀·목록 */
+.pin--cafe{background:#8B5A2B!important;font-size:14px}
+.place-row.cafe-row{align-items:flex-start}
+.cafe-row .pr-num{background:#8B5A2B}
+.cafe-row .pr-desc{display:block;margin-top:2px;font-size:13px;line-height:1.4;color:var(--ink2)}
+.cafe-row .pr-hours{display:block;margin-top:1px;font-size:12px;color:var(--muted)}
+.cafe-note{padding:10px 16px;font-size:12.5px;color:var(--muted);border-bottom:.5px solid var(--line)}
 .taxi-btn{display:flex;width:100%;min-height:48px;margin:4px 0 10px;padding:8px 14px;border-radius:14px;background:#FFCC00;color:#1c1c1e;font-size:16px;font-weight:800;align-items:center;justify-content:center;gap:6px;text-align:center}
 .taxi-btn.self{background:var(--fill);color:var(--blue);font-size:14px;min-height:40px;font-weight:700}
 .taxi-box{display:none;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--card);border:1.5px solid #FFCC00}
@@ -344,7 +351,7 @@ html,body{overscroll-behavior-x:none}
   <h2>날짜별 동선</h2>
   <p class="fine" style="margin:0 0 10px">‘길찾기’ 버튼은 고덕지도 앱을 먼저 열고, 없으면 웹 지도로 열립니다.</p>
   <div class="cl-tools" style="margin:0 0 10px"><button class="btn sec" id="locateBtn">내 현재 위치 표시</button><span class="fine" id="locationStatus" style="margin:0"></span></div>
-  <div class="seg2 map-seg"><button data-mday="all">전체</button><button data-mday="day1">Day 1</button><button data-mday="day2">Day 2</button><button data-mday="day3">Day 3</button></div>
+  <div class="seg2 map-seg"><button data-mday="all">전체</button><button data-mday="day1">Day 1</button><button data-mday="day2">Day 2</button><button data-mday="day3">Day 3</button><button data-mday="coffee">☕ 커피</button></div>
   <div id="mapbox" class="mapbox"><div class="map-fallback">지도를 불러오는 중입니다.</div></div>
   <p class="fine" style="margin:8px 0 10px">지도 그림이 안 나오면(중국 현지 인터넷에서 자주 그럼) 아래 목록과 고덕지도 단추를 쓰세요. 🚕 단추는 인터넷 없이도 열립니다.</p>
   <div class="place-list card" id="placeList"></div>
@@ -1001,6 +1008,8 @@ html,body{overscroll-behavior-x:none}
   const TRIP_DAYS={'2026-10-21':'day1','2026-10-22':'day2','2026-10-23':'day3'};
   let mapDay='all';try{mapDay=TRIP_DAYS[new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date())]||'all';}catch(e){mapDay='all';}
   let myPos=null;
+  // ☕ 커피 타임(일정과 별도). 최근 6개월 후기로 고른 목록, 2026-10-17
+  const CAFES=[{"label": "Metal Hands 난창루점", "area": "쓰난루", "tag": "커피 맛", "q": "铁手咖啡 南昌路234号", "lat": 31.21986, "lng": 121.46067, "desc": "이 구역에서 커피 맛으로 고르면 1순위. 피스타치오 메뉴 평이 좋음", "hours": "", "approx": false, "cafe": true, "venue": "铁手咖啡 南昌路234号"}, {"label": "스타벅스 리저브 쓰난공관점", "area": "쓰난루", "tag": "분위기", "q": "星巴克臻选 思南公馆", "lat": 31.21696, "lng": 121.46297, "desc": "옛 건물을 쓴 여러 층짜리 리저브 매장. 쓰난공관 산책하며 들르기 좋음", "hours": "07:00~22:00(표시 기준 시점 불명)", "approx": true, "cafe": true, "venue": "星巴克臻选 思南公馆"}, {"label": "쓰난북스 북카페", "area": "쓰난루", "tag": "분위기", "q": "思南书局", "lat": 31.21722, "lng": 121.46461, "desc": "옛 저택을 고친 서점 카페. 주말엔 마켓·공연 같은 행사가 열리기도 함", "hours": "", "approx": false, "cafe": true, "venue": "思南书局"}, {"label": "Manner Coffee 북와이탄 궈커빈장점", "area": "와이탄", "tag": "뷰 + 가성비", "q": "MANNER COFFEE 国客滨江店", "lat": 31.24798, "lng": 121.49173, "desc": "통유리로 동방명주가 보이고 강변 야외석도 있음. 라떼 20위안 안팎. 사람이 많아 아침 일찍이 좋음", "hours": "08:00 무렵부터(바뀐 듯하다는 글 있음)", "approx": false, "cafe": true, "venue": "MANNER COFFEE 国客滨江店"}, {"label": "와이탄 신호탑 카페", "area": "와이탄", "tag": "뷰 + 한적함", "q": "外滩信号台", "lat": 31.23516, "lng": 121.48778, "desc": "100년 넘은 신호탑 건물 2층 창가에서 옛 건물과 루자쭈이 고층빌딩이 함께 보임. 예원과 묶기 좋음", "hours": "매일 10:00~22:00 · 예약 없이", "approx": false, "cafe": true, "venue": "外滩信号台"}, {"label": "REi·FLOWER COFFEE BAR", "area": "와이탄", "tag": "뷰 + 한적함", "q": "REi FLOWER COFFEE BAR 北苏州路234号", "lat": 31.24615, "lng": 121.48515, "desc": "쑤저우허 바로 앞 테라스에서 동방명주가 정면. 저녁엔 바로 운영", "hours": "10:30~다음 날 01:00", "approx": true, "cafe": true, "venue": "REi FLOWER COFFEE BAR 北苏州路234号"}, {"label": "Dugout Coffee & Brunch", "area": "와이탄", "tag": "뷰", "q": "Dugout Coffee Brunch 上海", "desc": "동방명주가 보이는 야외 테라스가 있는 브런치 카페. 음식이 띄엄띄엄 나온다는 후기", "hours": "", "cafe": true, "venue": "Dugout Coffee Brunch 上海"}, {"label": "M Stand (추가 후보)", "area": "와이탄", "tag": "한적함", "q": "M Stand 北外滩", "desc": "Manner 북와이탄점 근처, 사람이 적은 편. 야외라 날씨 영향이 크고 화장실이 따로 없음", "hours": "", "cafe": true, "venue": "M Stand 北外滩"}];
   // 카드의 「지도에서 보기」로 넘어온 장소. 날짜 단추를 직접 누르면 풀린다
   let focusPlace=null;
   const NEAR_KM=40;
@@ -1016,9 +1025,22 @@ html,body{overscroll-behavior-x:none}
       layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['get','color'],'line-width':3.5,'line-opacity':.85,'line-dasharray':[2,1.6]}}]};
   }
   function openCardByTitle(title){const k=META.findIndex(m=>m.title===title);if(k<0)return;showDay(META[k].day);openSheet(k);}
+  function cafeRow(p,k){
+    const r=document.createElement('div');r.className='place-row cafe-row';
+    r.innerHTML='<button class="pr-main"><span class="pr-num">☕</span><span class="pr-txt"><b></b><span class="pr-meta"></span><span class="pr-desc"></span><span class="pr-hours"></span></span></button>';
+    r.querySelector('b').textContent=p.label;
+    r.querySelector('.pr-meta').textContent=p.area+' · '+p.tag+(p.lat?(p.approx?' · 대략 위치':''):' · 지도 위치 미확인');
+    if(myPos&&p.lat){const d=document.createElement('span');d.className='pr-dist';d.textContent=' · 내 위치에서 '+fmtDist(distKm(myPos,p));r.querySelector('.pr-meta').appendChild(d);}
+    r.querySelector('.pr-desc').textContent=p.desc;
+    r.querySelector('.pr-hours').textContent='영업: '+(p.hours||'글마다 다름')+' — 가기 전 고덕지도로 확인';
+    const am=document.createElement('button');am.className='pr-card map-search';am.textContent='고덕';am.dataset.name=p.q;r.appendChild(am);bindInner(r);
+    return r;
+  }
   function renderList(shown){
     placeList.innerHTML='';const rows=[];let lastDay=null;
+    if(mapDay==='coffee'){const n=document.createElement('div');n.className='cafe-note';n.textContent='☕ 커피 타임 · 시간 나면 들르기 — 일정에는 넣지 않았어요. 내 위치를 잡으면 가까운 순으로 보여요.';placeList.appendChild(n);}
     shown.forEach(p=>{
+      if(p.cafe){const r=cafeRow(p);placeList.appendChild(r);rows.push(r);return;}
       if(p.me){const r=document.createElement('div');r.className='place-row current-row';r.innerHTML='<button class="pr-main"><span class="pr-num" style="background:#0A84FF">●</span><span class="pr-txt"><b>내 현재 위치</b><span>휴대폰 위치(중국에선 수백 m 어긋날 수 있음)</span></span></button>';placeList.appendChild(r);rows.push(r);return;}
       if(p.day!==lastDay){lastDay=p.day;const hd=document.createElement('div');hd.className='pl-day';hd.innerHTML='<i style="background:'+DAY_COLOR[p.day]+'"></i>'+DAY_LABEL[p.day];placeList.appendChild(hd);}
       const r=document.createElement('div');r.className='place-row';
@@ -1031,11 +1053,13 @@ html,body{overscroll-behavior-x:none}
       r.querySelector('.pr-card').before(am);bindInner(r);
       placeList.appendChild(r);rows.push(r);
     });
+    if(mapDay==='coffee')CAFES.filter(c=>!c.lat).forEach(c=>placeList.appendChild(cafeRow(c)));
     return rows;
   }
   function renderMap(){
     document.querySelectorAll('.map-seg button').forEach(b=>b.classList.toggle('on',b.dataset.mday===mapDay));
-    const shown=places.filter(p=>mapDay==='all'||p.day===mapDay).concat(myPos?[myPos]:[]);
+    const cafes=CAFES.filter(c=>c.lat);if(myPos)cafes.sort((a,b)=>distKm(myPos,a)-distKm(myPos,b));
+    const shown=(mapDay==='coffee'?cafes:places.filter(p=>mapDay==='all'||p.day===mapDay)).concat(myPos?[myPos]:[]);
     const rows=renderList(shown);mapEl.innerHTML='';
     const highlight=(index,scroll)=>{rows.forEach((r,k)=>r.classList.toggle('map-selected',k===index));if(scroll&&index!==null&&rows[index])rows[index].scrollIntoView({block:'nearest'});};
     let map=null;const FOCUS_ZOOM=16;
@@ -1051,14 +1075,14 @@ html,body{overscroll-behavior-x:none}
     try{
       map=MapHelpers.mountMap(mapEl,{places:shown,overlays:[routeOverlay(shown)],
         baseStyle:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light',
-        marker:(p,index,selected)=>p.me?'<div class="pin pin--me"></div>':'<div class="pin'+(selected?' pin--on':'')+'" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</div>',
+        marker:(p,index,selected)=>p.me?'<div class="pin pin--me"></div>':p.cafe?'<div class="pin pin--cafe'+(selected?' pin--on':'')+'">☕</div>':'<div class="pin'+(selected?' pin--on':'')+'" style="background:'+DAY_COLOR[p.day]+'">'+p.order+'</div>',
         onSelectPlace:index=>{highlight(index,true);if(index!==null)flyToPlace(index);}},fallback);
       if(map)rows.forEach((r,k)=>r.querySelector('.pr-main').addEventListener('click',()=>{map.selectPlace(k);highlight(k,false);flyToPlace(k);mapEl.scrollIntoView({behavior:'smooth',block:'center'});}));
       const fk=focusPlace?shown.indexOf(focusPlace):-1;
       if(map&&fk>=0){map.selectPlace(fk);highlight(fk,true);setTimeout(()=>focusView(fk),60);}
     }catch(e){fallback();}
   }
-  document.querySelectorAll('.map-seg button').forEach(b=>b.addEventListener('click',()=>{mapDay=b.dataset.mday;focusPlace=null;renderMap();}));
+  document.querySelectorAll('.map-seg button').forEach(b=>b.addEventListener('click',()=>{mapDay=b.dataset.mday;focusPlace=null;renderMap();if(mapDay==='coffee'&&!myPos)locateMe();}));
   function ensureMap(){if(mapReady)return;mapReady=true;setTimeout(()=>renderMap(),50);}
   document.getElementById('locateBtn').addEventListener('click',()=>locateMe());
   // 카드 → 지도 탭: 그 날짜 핀만 보이게 하고 그 장소로 옮긴 뒤 내 위치도 잡는다
