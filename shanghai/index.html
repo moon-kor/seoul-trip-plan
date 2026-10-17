@@ -229,6 +229,7 @@ h2{font-size:24px;letter-spacing:-.02em;margin:6px 0 12px;font-weight:800}
 .mn-backup{display:flex;flex-direction:column;gap:8px}.mn-backup .btn{width:100%}
 .mn-import{display:flex;align-items:center;justify-content:center;cursor:pointer}
 
+.move-row{display:flex;align-items:center;gap:6px;padding:7px 14px 7px 16px;background:var(--fill2);border-bottom:.5px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.35}.move-row:last-child{border-bottom:0}.move-row b{color:var(--ink);font-weight:700}.move-line{margin:2px 0 8px;padding:8px 12px;border-radius:12px;background:var(--fill2);font-size:14px;line-height:1.45}.move-line div+div{margin-top:2px}
 .taxi-btn{display:flex;width:100%;min-height:48px;margin:4px 0 10px;padding:8px 14px;border-radius:14px;background:#FFCC00;color:#1c1c1e;font-size:16px;font-weight:800;align-items:center;justify-content:center;gap:6px;text-align:center}
 .taxi-btn.self{background:var(--fill);color:var(--blue);font-size:14px;min-height:40px;font-weight:700}
 .taxi-box{display:none;margin:0 0 14px;padding:12px 14px;border-radius:14px;background:var(--card);border:1.5px solid #FFCC00}
@@ -627,12 +628,25 @@ html,body{overscroll-behavior-x:none}
     const n=NEXT_STOP[title];if(!n)return null;const p=PLACES_ZH[n.to];
     return taxiBlock(n.to,(n.walk?'🚶 다음 목적지: ':'🚕 다음 목적지: ')+p.name+(n.walk?' (가까움·도보)':''),'다음 목적지 · '+p.name,n.walk,false);
   }
+
+  // ---- 구간 이동: 이 카드에서 다음 장소까지 [아이콘, 굵게, 나머지]. 구글 지도 조회값(2026-10-17)에 막힘·아이 걸음 여유를 더한 대략치
+  const MOVES={"공항 출발 목표": [["🚐", "호텔까지 차로 약 25~40분", "· 19km"]], "호텔에 짐 맡기기": [["🚕", "동물원까지 차로 약 20~30분", "· 12km"]], "상하이 야생동물원": [["🚕", "그랜드마더(난징동루)까지 차로 약 1시간~1시간 30분", "· 44km"]], "저녁식사 · 상하이 그랜드마더": [["🚶", "미니소까지 걸어서 약 3분", "· 170m"]], "MINISO LAND": [["🚕", "호텔까지 차로 약 50분~1시간 10분", "· 46km"]], "기상·조식·준비": [["🚌", "디즈니까지 셔틀·차로 약 25~40분", "· 20km"]], "야경·기념품·야간쇼": [["🚌", "호텔까지 셔틀·차로 약 25~40분", "· 22km"]], "체크아웃·시내 이동": [["🚕", "예원까지 차로 약 50분~1시간 10분", "· 43km"]], "예원·예원상성 산책": [["🚶", "난샹만터우뎬까지 걸어서 약 5분", "· 예원 안"]], "점심 · 난샹만터우뎬": [["🚶", "와이탄까지 걸어서 약 20~25분", "· 1.5km"], ["🚕", "차로 약 5~10분", ""]], "푸동공항 T2로 출발": [["🚕", "공항 T2까지 차로 약 50분~1시간 10분", "· 47km"]]};
+  function moveLines(cls,legs){const d=document.createElement('div');d.className=cls;
+    legs.forEach(([ic,strong,rest])=>{const r=document.createElement('div');const b=document.createElement('b');b.textContent=strong;
+      r.append(ic+' ',b,' '+rest);d.appendChild(r);});return d;}
+  document.querySelectorAll('.stop-row').forEach(row=>{
+    const legs=MOVES[(row.querySelector('.st-body b')?.textContent||'').trim()];
+    if(legs)row.after(moveLines('move-row',legs));
+  });
+  document.querySelectorAll('.daypane').forEach(p=>{const f=p.querySelector('p.fine');if(!f)return;
+    const n=document.createElement('p');n.className='fine';n.style.margin='-6px 0 12px';n.textContent="이동 시간은 구글 지도로 조회한 대략치입니다(10/17). 차는 막히는 시간을 더해 범위로 적었고, 그날 실제 시간은 고덕지도로 확인하세요.";f.after(n);});
   // 카드: 제목 아래에 「다음 목적지」, 그 아래 작게 「이 장소 주소」
   function addTaxiButtons(root,title){
     const anchor=root.querySelector('.sub')||root.firstChild;
     const self=THIS_STOP[title]?taxiBlock(THIS_STOP[title],'📍 이 장소 주소 보기','이 장소 · '+PLACES_ZH[THIS_STOP[title]].name,false,true):null;
     if(self)anchor.after(self);
     const next=nextBlock(title);if(next)anchor.after(next);
+    if(MOVES[title])anchor.after(moveLines('move-line',MOVES[title]));
   }
   // 지도 탭 주소 카드: 그 장소 주소를 같은 방식으로
   const ADDR_KEY={'윤허예보 호텔':'hotel','MINISO LAND':'miniso','상하이 그랜드마더':'grandma','난샹만터우뎬':'lunch','뤼보랑':null};
